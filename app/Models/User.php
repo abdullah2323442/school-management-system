@@ -43,7 +43,7 @@ class User extends Authenticatable
         return $this->role === self::ROLE_ADMIN;
     }
 
-    public function isEditor()
+    public function isTeacher()
     {
         return $this->role === self::ROLE_TEACHER;
     }
@@ -117,17 +117,37 @@ class User extends Authenticatable
         return $this->belongsTo(Section::class, 'section_id');
     }
 
+    // app/Models/User.php
+
     public function subjects()
     {
-        return $this->hasMany(Subject::class, 'teacher_id')->where('role', User::ROLE_TEACHER);
+        return $this->hasMany(Subject::class, 'teacher_id');
     }
+
+
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'user_id');
+    }
+
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class, 'teacher_id');
+    }
+
+    public function submissions()
+{
+    return $this->hasMany(Submission::class);
+}
+
 
     // app/Models/User.php
 
-public function attendances()
-{
-    return $this->hasMany(Attendance::class, 'user_id');
-}
+    // public function submissions()
+    // {
+    //     return $this->hasMany(Submission::class);
+    // }
 
 
 }

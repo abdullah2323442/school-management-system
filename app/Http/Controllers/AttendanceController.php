@@ -6,14 +6,31 @@ use App\Models\Attendance;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
 {
-    // app/Http/Controllers/AttendanceController.php
-
-    public function index(Request $request, $subjectId)
+    public function index()
     {
+        $user = Auth::user();
+
+        if ($user->isTeacher()) {
+            $subjects = $user->subjects;
+            return view('attendance.index', compact('subjects'));
+        }
+
+        return redirect()->back()->with('error', 'You are not authorized to access this page.');
+    }
+
+    public function show(Request $request, $subjectId)
+    {
+        $user = Auth::user();
         $subject = Subject::findOrFail($subjectId);
+
+        if ($subject->teacher_id !== $user->id) {
+            return redirect()->back()->with('error', 'You are not authorized to access this subject.');
+        }
+
         $students = $subject->class->students()->with('attendances', function ($query) use ($subjectId, $request) {
             $query->where('subject_id', $subjectId);
             if ($request->has('date')) {
@@ -21,13 +38,18 @@ class AttendanceController extends Controller
             }
         })->get();
 
-        return view('attendance.index', compact('students', 'subject'));
+        return view('attendance.show', compact('students', 'subject'));
     }
-
 
     public function store(Request $request, $subjectId)
     {
+        $user = Auth::user();
         $subject = Subject::findOrFail($subjectId);
+
+        if ($subject->teacher_id !== $user->id) {
+            return redirect()->back()->with('error', 'You are not authorized to access this subject.');
+        }
+
         $students = $subject->class->students;
 
         foreach ($students as $student) {

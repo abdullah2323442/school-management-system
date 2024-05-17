@@ -29,4 +29,9 @@ class Section extends Model
         return $this->hasMany(Subject::class, 'section_id');
     }
 
+    public function submissions()
+    {
+        return $this->hasManyThrough(Submission::class, Subject::class);
+    }
+     
 }

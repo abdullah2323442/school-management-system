@@ -11,10 +11,7 @@ class Subject extends Model
 
     protected $fillable = ['name', 'teacher_id', 'class_id', 'section_id'];
 
-    public function teacher()
-    {
-        return $this->belongsTo(User::class, 'teacher_id')->where('role', User::ROLE_TEACHER);
-    }
+
 
     public function class()
     {
@@ -25,4 +22,32 @@ class Subject extends Model
     {
         return $this->belongsTo(Section::class, 'section_id');
     }
+
+    //     public function teacher()
+// {
+//     return $this->belongsTo(User::class, 'teacher_id')->whereHas('role', function ($query) {
+//         $query->where('role', User::ROLE_TEACHER);
+//     });
+// }
+
+    public function teacher()
+    {
+        return $this->belongsTo(User::class)->where('role', User::ROLE_TEACHER);
+    }
+
+
+
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class, 'subject_id');
+    }
+
+    public function submissions()
+    {
+        return $this->hasMany(Submission::class);
+    }
+    
+
+
+
 }
